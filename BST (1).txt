@@ -1,0 +1,131 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+template<typename T> class BST {
+private:
+    int size = 0;
+    struct Node {
+        T data;
+        Node* left;
+        Node* right;
+
+        Node(T data, Node* left, Node* right) : data(data), left(left), right(right) {}
+    };
+    Node* root = nullptr;
+    Node* insert(T data, Node* node) {
+        if (node == nullptr) {
+            node = new Node(data, nullptr, nullptr);
+            return node;
+        }
+        if (data < node->data)
+            node->left = insert(data, node->left);
+        else if (data > node->data)
+            node->right = insert(data, node->right);
+
+        return node;
+    }
+    Node * del(Node* node, T data){
+        if (node == nullptr)
+            return node;
+
+        // node to be deleted
+        if (node->data > data) {
+            node->left = del(node->left, data);
+            return node;
+        }
+        else if (node->data < data) {
+            node->right = del(node->right, data);
+            return node;
+        }
+
+        if (node->left == nullptr) {
+            Node* temp = node->right;
+            delete node;
+            return temp;
+        }
+        else if (node->right == nullptr) {
+            Node* temp = node->left;
+            delete node;
+            return temp;
+        }
+
+        else {
+
+            Node *succParent = node;
+
+            Node *succ = node->right;
+            while (succ->left != nullptr) {
+                succParent = succ;
+                succ = succ->left;
+            }
+
+            if (succParent != node)
+                succParent->left = succ->right;
+            else
+                succParent->right = succ->right;
+
+            node->data = succ->data;
+
+            delete succ;
+            return node;
+        }
+    }
+
+    void preorder(Node* node) const{
+        if (node == nullptr)
+            return;
+        cout << node->data << " ";
+        preorder(node->left);
+        preorder(node->right);
+    }
+    void inorder(Node* node) const{
+        if (node == nullptr)
+            return;
+        inorder(node->left);
+        cout << node->data << " ";
+        inorder(node->right);
+    }
+    void postorder(Node* node) const{
+        if (node == nullptr)
+            return;
+        postorder(node->left);
+        postorder(node->right);
+        cout << node->data << " ";
+    }
+public:
+    void insert(T data) {
+        root = insert(data, root);
+    }
+    void del (T data){
+        root = del(root, data);
+    }
+    bool contain(T data){
+        return true;
+    }
+    friend ostream& operator<<(ostream& os, const BST& tree) {
+        tree.preorder(tree.root);
+        return os;
+    }
+};
+int main() {
+//    Map<string, int> map;
+//    map.put("Karakat", 100);
+//    map.put("Assau", 49);
+//    map.put("Dias", 100);
+//    map.put("Karakat", 90);
+
+
+    BST<string> tree;
+    tree.insert("F");
+    tree.insert("Q");
+    tree.insert("C");
+    tree.insert("Z");
+    tree.insert("A");
+    tree.insert("D");
+    tree.del("F");
+    cout << tree;
+
+    return 0;
+}
